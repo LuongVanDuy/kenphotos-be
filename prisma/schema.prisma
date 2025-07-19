@@ -1,0 +1,149 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["filteredRelationCount"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  CUSTOMER
+}
+
+model User {
+  id                Int       @id @default(autoincrement())
+  email             String    @unique @db.VarChar(320)
+  firstName         String?   @map("first_name") @db.VarChar(255)
+  lastName          String?   @map("last_name") @db.VarChar(255)
+  password          String    @db.VarChar(72)
+
+  businessName      String?   @map("business_name") @db.VarChar(255)
+  country           String?   @db.VarChar(100)
+  phoneNumber       String?   @map("phone_number") @db.VarChar(20)
+  timezone          String?   @db.VarChar(100)
+  postalCode        String?   @map("postal_code") @db.VarChar(20)
+  businessWebsite   String?   @map("business_website") @db.VarChar(255)
+
+  role              Role      @default(CUSTOMER)
+
+  status            Int       @default(1) @db.TinyInt
+  deleteFlg         Int?      @default(0) @map("delete_flg") @db.TinyInt
+  createdUser       Int?      @map("created_user")
+  updatedUser       Int?      @map("updated_user")
+  createdTime       DateTime  @default(now()) @map("created_time")
+  updatedTime       DateTime  @default(now()) @map("updated_time")
+
+  posts             Post[]
+  media             Media[]
+
+  @@index([deleteFlg])
+  @@map("user")
+}
+
+model EmailVerify {
+  id          Int     @id @default(autoincrement())
+  email       String  @unique @db.VarChar(320)
+  verifyToken String? @unique @map("verify_token") @db.VarChar(256)
+
+  @@map("email_verify")
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  PRIVATE
+  PASSWORD
+  TRASH
+}
+
+model Post {
+  id            Int              @id @default(autoincrement())
+  title         String           @db.VarChar(500)
+  content       String           @db.Text
+  excerpt       String?          @db.Text
+  slug          String           @unique @db.VarChar(255)
+  status        PostStatus       @default(DRAFT)
+  password      String?          @db.VarChar(255)
+  thumbnail     String?          @db.VarChar(500)
+
+  authorId      Int
+  author        User             @relation(fields: [authorId], references: [id])
+  categories    PostCategory[]   
+
+  deleteFlg     Int?             @default(0) @map("delete_flg") @db.TinyInt
+  createdUser   Int?             @map("created_user")
+  updatedUser   Int?             @map("updated_user")
+  createdTime   DateTime         @default(now()) @map("created_time")
+  updatedTime   DateTime         @default(now()) @map("updated_time")
+
+  @@index([slug])
+  @@index([status])
+  @@index([createdTime])
+  @@map("post")
+}
+
+model PostCategory {
+  postId     Int
+  categoryId Int
+
+  post       Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([postId, categoryId])
+  @@map("post_categories")
+}
+
+model Category {
+  id            Int              @id @default(autoincrement())
+  name          String           @db.VarChar(255)
+  slug          String           @unique @db.VarChar(255)
+  description   String?          @db.Text
+  parentId      Int?             @map("parent_id")
+  parent        Category?        @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children      Category[]       @relation("CategoryHierarchy")
+
+  posts         PostCategory[]   
+
+  deleteFlg     Int?             @default(0) @map("delete_flg") @db.TinyInt
+  createdUser   Int?             @map("created_user")
+  updatedUser   Int?             @map("updated_user")
+  createdTime   DateTime         @default(now()) @map("created_time")
+  updatedTime   DateTime         @default(now()) @map("updated_time")
+
+  @@map("category")
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+  AUDIO
+  PDF
+  DOC
+  OTHER
+}
+
+model Media {
+  id           Int       @id @default(autoincrement())
+  name         String    @db.VarChar(255)
+  slug         String?   @unique @db.VarChar(255)
+  type         MediaType @default(IMAGE)
+  mimeType     String    @db.VarChar(100)
+  size         Int
+  url          String    @db.VarChar(1000)
+  altText      String?   @db.VarChar(500)
+  description  String?   @db.Text
+
+  uploadedById Int
+  uploadedBy   User      @relation(fields: [uploadedById], references: [id])
+
+  deleteFlg    Int?      @default(0) @map("delete_flg") @db.TinyInt
+  createdUser  Int?      @map("created_user")
+  updatedUser  Int?      @map("updated_user")
+  createdTime  DateTime  @default(now()) @map("created_time")
+  updatedTime  DateTime  @default(now()) @map("updated_time")
+
+  @@map("media")
+}
