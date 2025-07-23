@@ -25,13 +25,24 @@ CREATE TABLE `user` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
+CREATE TABLE `email_verify` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `email` VARCHAR(320) NOT NULL,
+    `verify_token` VARCHAR(256) NULL,
+
+    UNIQUE INDEX `email_verify_email_key`(`email`),
+    UNIQUE INDEX `email_verify_verify_token_key`(`verify_token`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
 CREATE TABLE `post` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `title` VARCHAR(500) NOT NULL,
     `content` TEXT NOT NULL,
     `excerpt` TEXT NULL,
     `slug` VARCHAR(255) NOT NULL,
-    `status` ENUM('DRAFT', 'PUBLISHED', 'PRIVATE', 'PASSWORD', 'TRASH') NOT NULL DEFAULT 'DRAFT',
+    `status` TINYINT NOT NULL DEFAULT 0,
     `password` VARCHAR(255) NULL,
     `thumbnail` VARCHAR(500) NULL,
     `authorId` INTEGER NOT NULL,

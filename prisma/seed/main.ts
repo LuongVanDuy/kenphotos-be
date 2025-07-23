@@ -4,12 +4,12 @@ import * as bcrypt from "bcrypt";
 const prisma = new PrismaClient();
 
 async function main() {
-  const passwordHash = await bcrypt.hash("password123", 10);
+  const passwordHash = await bcrypt.hash("123456@", 10);
 
   await prisma.user.createMany({
     data: [
       {
-        email: "admin@example.com",
+        email: "admin@demo.test",
         password: passwordHash,
         role: "ADMIN",
         firstName: "Alice",
@@ -22,7 +22,7 @@ async function main() {
         businessWebsite: "https://adminsolutions.vn",
       },
       {
-        email: "john.doe@example.com",
+        email: "john.doe@demo.test",
         password: passwordHash,
         role: "CUSTOMER",
         firstName: "John",
@@ -35,7 +35,7 @@ async function main() {
         businessWebsite: "https://doeventures.com",
       },
       {
-        email: "jane.smith@example.com",
+        email: "jane.smith@demo.test",
         password: passwordHash,
         role: "CUSTOMER",
         firstName: "Jane",

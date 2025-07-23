@@ -38,6 +38,7 @@ export enum Module {
   USER = "USER",
   MEDIA = "MEDIA",
   POST = "POST",
+  CATEGORY = "CATEGORY",
 }
 
 export enum Permission {

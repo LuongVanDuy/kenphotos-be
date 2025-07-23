@@ -1,45 +1,50 @@
-import { IsArray, IsOptional, IsString, IsNumber } from "class-validator";
+// dto/create-user.dto.ts
 import { ApiProperty } from "@nestjs/swagger";
+import { IsEmail, IsOptional, IsString } from "class-validator";
 
-export class UpdatePostDto {
+export class UpdateUserDto {
   @ApiProperty({ required: false })
   @IsOptional()
-  @IsString()
-  title?: string;
-
-  @ApiProperty({ required: false })
-  @IsOptional()
-  @IsString()
-  content?: string;
+  @IsEmail()
+  email?: string;
 
   @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
-  excerpt?: string;
+  firstName?: string;
 
   @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
-  slug?: string;
-
-  @ApiProperty({ required: false })
-  @IsOptional()
-  @IsNumber()
-  status?: number;
+  lastName?: string;
 
   @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
-  password?: string;
+  phoneNumber?: string;
 
   @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
-  thumbnail?: string;
+  businessName?: string;
 
-  @ApiProperty({ type: [Number], required: false })
+  @ApiProperty({ required: false })
   @IsOptional()
-  @IsArray()
-  @IsNumber({}, { each: true })
-  categoryIds?: number[];
+  @IsString()
+  country?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  timezone?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  postalCode?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  businessWebsite?: string;
 }

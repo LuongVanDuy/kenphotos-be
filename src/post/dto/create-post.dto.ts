@@ -1,117 +1,48 @@
-import {
-  IsString,
-  IsOptional,
-  IsInt,
-  IsArray,
-  ArrayNotEmpty,
-  ValidateNested,
-} from "class-validator";
-import { Type } from "class-transformer";
+import { IsArray, IsNotEmpty, IsOptional, IsString, IsNumber } from "class-validator";
+import { ApiProperty } from "@nestjs/swagger";
 
-export class TourImageDto {
-  @IsString()
-  url: string;
-
-  @IsOptional()
-  @IsString()
-  alt?: string;
-}
-
-export class TourLocationDto {
+export class CreatePostDto {
+  @ApiProperty()
+  @IsNotEmpty()
   @IsString()
   title: string;
 
-  @IsString()
-  image: string;
-}
-
-export class DepartureDateDto {
-  @IsString()
-  departureDate: string;
-
-  @IsInt()
-  type: number;
-}
-
-export class TourScheduleDto {
-  @IsString()
-  day: string;
-
-  @IsString()
-  title: string;
-
+  @ApiProperty()
+  @IsNotEmpty()
   @IsString()
   content: string;
-}
 
-export class CreateTourDto {
-  @IsString()
-  title: string;
-
-  @IsString()
-  thumbnail: string;
-
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
-  description?: string;
+  excerpt?: string;
 
-  @IsInt()
-  priceAdult: number;
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  slug: string;
 
-  @IsInt()
-  priceChild: number;
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsNumber()
+  status?: number;
 
-  @IsInt()
-  priceBaby: number;
-
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
-  priceInclude?: string;
+  password?: string;
 
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
-  priceExclude?: string;
+  thumbnail?: string;
 
-  @IsOptional()
-  @IsString()
-  childTicket?: string;
-
+  @ApiProperty({
+    type: [Number],
+    required: false,
+  })
   @IsOptional()
   @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => TourImageDto)
-  images?: TourImageDto[];
-
-  @IsOptional()
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => DepartureDateDto)
-  departureDate?: DepartureDateDto[];
-
-  @IsOptional()
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => TourLocationDto)
-  locations?: TourLocationDto[];
-
-  @IsOptional()
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => TourScheduleDto)
-  schedules?: TourScheduleDto[];
-
-  @IsOptional()
-  @IsArray()
-  @ArrayNotEmpty()
-  @IsInt({ each: true })
+  @IsNumber({}, { each: true })
   categoryIds?: number[];
-
-  transportInfo?: {
-    departFrom: string;
-    departTo?: string;
-    arriveFrom?: string;
-    arriveTo?: string;
-    transportMode?: string;
-    description?: string;
-  };
 }

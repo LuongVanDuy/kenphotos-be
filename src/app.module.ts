@@ -7,6 +7,7 @@ import { AuthModule } from "./auth/auth.module";
 import { MediaModule } from "./media/media.module";
 import { PostModule } from "./post/post.module";
 import { MailModule } from "./mail/mail.module";
+import { CategoryModule } from "./category/category.module";
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { MailModule } from "./mail/mail.module";
     MailModule,
     UserModule,
     PostModule,
+    CategoryModule,
     MediaModule,
   ],
   controllers: [AppController],

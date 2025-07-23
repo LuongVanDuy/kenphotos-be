@@ -51,21 +51,13 @@ model EmailVerify {
   @@map("email_verify")
 }
 
-enum PostStatus {
-  DRAFT
-  PUBLISHED
-  PRIVATE
-  PASSWORD
-  TRASH
-}
-
 model Post {
   id            Int              @id @default(autoincrement())
   title         String           @db.VarChar(500)
   content       String           @db.Text
   excerpt       String?          @db.Text
   slug          String           @unique @db.VarChar(255)
-  status        PostStatus       @default(DRAFT)
+  status        Int              @default(0) @db.TinyInt
   password      String?          @db.VarChar(255)
   thumbnail     String?          @db.VarChar(500)
 
