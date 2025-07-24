@@ -11,6 +11,102 @@ import { UpdatePostDto } from "./dto/update-post";
 export class PostService {
   constructor(private prisma: PrismaService) {}
 
+  async findAllPublic(params: FindPostDto) {
+    const { search, pageable, sort, limitWords } = params;
+
+    const where: any = {
+      title: likeField(search),
+      status: 1,
+      deleteFlg: 0,
+    };
+
+    const rawPosts = await this.prisma.post.findMany({
+      where,
+      select: {
+        id: true,
+        title: true,
+        excerpt: true,
+        content: true,
+        author: {
+          select: {
+            firstName: true,
+            lastName: true,
+          },
+        },
+        createdTime: true,
+      },
+      skip: pageable.offset,
+      take: pageable.limit,
+      orderBy: sort,
+    });
+
+    const data = rawPosts.map((post) => {
+      let content = post.content || "";
+
+      if (limitWords !== undefined) {
+        const words = content.trim().split(/\s+/);
+        content = words.slice(0, limitWords).join(" ");
+      }
+
+      return {
+        id: post.id,
+        title: post.title,
+        excerpt: post.excerpt,
+        content,
+        author: {
+          firstName: post.author.firstName,
+          lastName: post.author.lastName,
+        },
+        createdTime: post.createdTime,
+      };
+    });
+
+    return data;
+  }
+
+  async countPublic(params: FindPostDto): Promise<number> {
+    const { search } = params;
+
+    const where: any = {
+      status: 1,
+      deleteFlg: 0,
+      title: likeField(search),
+    };
+
+    return this.prisma.post.count({ where });
+  }
+
+  async findBySlug(slug: string) {
+    const post = await this.prisma.post.findFirst({
+      where: {
+        slug,
+        status: 1,
+        deleteFlg: 0,
+      },
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        excerpt: true,
+        content: true,
+        author: {
+          select: {
+            firstName: true,
+            lastName: true,
+          },
+        },
+        createdTime: true,
+        updatedTime: true,
+      },
+    });
+
+    if (!post) {
+      throw new NotFoundException("Bài viết không tồn tại");
+    }
+
+    return post;
+  }
+
   async findAll(params: FindPostDto) {
     const { search, status, deleteFlg, pageable, sort } = params;
 

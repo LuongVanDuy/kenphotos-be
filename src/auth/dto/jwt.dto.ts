@@ -1,5 +1,9 @@
 export class JwtDto {
   id: number;
   email: string;
-  name: string;
+  firstName: string;
+  lastName: string;
+  businessName: string;
+  role: string;
+  status: number;
 }

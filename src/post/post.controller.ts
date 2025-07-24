@@ -17,7 +17,6 @@ import { UpdatePostDto } from "./dto/update-post";
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class PostController {
   constructor(private readonly postService: PostService) {}
-
   @Get()
   @Roles({ module: Module.POST, permission: Permission.READ })
   @ApiQuery({ name: "search", required: false })

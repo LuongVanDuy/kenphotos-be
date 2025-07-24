@@ -149,7 +149,11 @@ export class AuthService {
     const payload: JwtDto = {
       id: user.id,
       email: user.email,
-      name: user.businessName,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      businessName: user.businessName,
+      role: user.role,
+      status: user.status,
     };
 
     const token = this.signToken(payload);

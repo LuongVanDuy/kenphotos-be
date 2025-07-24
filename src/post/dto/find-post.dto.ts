@@ -6,4 +6,5 @@ export class FindPostDto {
   deleteFlg?: number;
   pageable?: Pageable;
   sort?: Sort;
+  limitWords?: number;
 }
