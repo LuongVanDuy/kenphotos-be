@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, ParseArrayPipe, Patch, Post, Put, Query, UseGuards } from "@nestjs/common";
 import { ApiBearerAuth, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
 import { RolesGuard } from "src/auth/guards/roles.guard";
@@ -12,7 +12,7 @@ import { Roles } from "src/common/decorators/roles.decorator";
 import { UpdateCategoryDto } from "./dto/update-category";
 
 @ApiTags("Categories")
-@Controller("tour/categories")
+@Controller("post/categories")
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class CategoryController {
@@ -58,9 +58,15 @@ export class CategoryController {
     return await this.categoryService.update(userRequest, Number(id), data);
   }
 
-  @Delete(":id")
+  @Patch(":id")
+  @Roles({ module: Module.CATEGORY, permission: Permission.UPDATE })
+  async setDefault(@Users() userRequest, @Param("id") id: number) {
+    return await this.categoryService.setDefaultCategory(userRequest, Number(id));
+  }
+
+  @Delete("permanent")
   @Roles({ module: Module.CATEGORY, permission: Permission.DELETE })
-  async delete(@Users() userRequest, @Param("id") id: number) {
-    return await this.categoryService.delete(userRequest, Number(id));
+  async deleteMany(@Users() userRequest, @Body("ids", new ParseArrayPipe({ items: Number })) ids: number[]) {
+    return await this.categoryService.deleteMany(userRequest, ids);
   }
 }

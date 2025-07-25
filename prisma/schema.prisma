@@ -36,6 +36,7 @@ model User {
   createdTime       DateTime  @default(now()) @map("created_time")
   updatedTime       DateTime  @default(now()) @map("updated_time")
 
+  services          Service[]
   posts             Post[]
   media             Media[]
 
@@ -97,7 +98,9 @@ model Category {
   parent        Category?        @relation("CategoryHierarchy", fields: [parentId], references: [id])
   children      Category[]       @relation("CategoryHierarchy")
 
-  posts         PostCategory[]   
+  posts         PostCategory[]
+
+  isDefault     Boolean          @default(false) @map("is_default")
 
   deleteFlg     Int?             @default(0) @map("delete_flg") @db.TinyInt
   createdUser   Int?             @map("created_user")
@@ -106,6 +109,118 @@ model Category {
   updatedTime   DateTime         @default(now()) @map("updated_time")
 
   @@map("category")
+}
+
+model Service {
+  id              Int       @id @default(autoincrement())
+  title           String    @db.VarChar(500)
+  content         String    @db.Text
+  slug            String    @unique @db.VarChar(255)
+  status          Int       @default(0) @db.TinyInt
+  type            Int       @default(0) @db.TinyInt    
+
+  originalPrice   Float?    @map("original_price")
+  discountedPrice Float?    @map("discounted_price")
+  rating          Float?    @map("rating")
+  orderCount      Int?      @map("order_count")
+
+  authorId        Int
+  author          User      @relation(fields: [authorId], references: [id])
+
+  images          ServiceImage[]
+  styles          ServiceStyle[] 
+  steps           ServiceStep[] 
+  idealFors       ServiceIdealFor[]
+  includes        ServiceInclude[]
+  addOns          ServiceAddOn[]
+
+  deleteFlg       Int?      @default(0) @map("delete_flg") @db.TinyInt
+  createdUser     Int?      @map("created_user")
+  updatedUser     Int?      @map("updated_user")
+  createdTime     DateTime  @default(now()) @map("created_time")
+  updatedTime     DateTime  @default(now()) @map("updated_time")
+
+  @@index([slug])
+  @@index([status])
+  @@index([createdTime])
+  @@map("services")
+}
+
+model ServiceImage {
+  id         Int      @id @default(autoincrement())
+  beforeUrl  String?  @db.VarChar(1000) @map("before_url")
+  afterUrl   String?  @db.VarChar(1000) @map("after_url")
+
+  serviceId  Int
+  service    Service  @relation(fields: [serviceId], references: [id])
+
+  @@map("service_images")
+}
+
+model ServiceStyle {
+  id         Int      @id @default(autoincrement())
+
+  title      String   @db.VarChar(255)  
+  beforeUrl  String?  @db.VarChar(1000)  @map("before_url")
+  afterUrl   String?  @db.VarChar(1000)  @map("after_url")
+
+  serviceId  Int
+  service    Service  @relation(fields: [serviceId], references: [id])
+
+  type       Int      @default(0) @db.TinyInt  
+
+  @@map("service_styles")
+}
+
+model ServiceStep {
+  id         Int      @id @default(autoincrement())
+
+  title      String   @db.VarChar(255)
+  content    String   @db.Text
+
+  beforeUrl  String?  @db.VarChar(1000) @map("before_url")
+  afterUrl   String?  @db.VarChar(1000) @map("after_url")
+
+  serviceId  Int
+  service    Service  @relation(fields: [serviceId], references: [id])
+
+  sortOrder  Int?     @map("sort_order") 
+
+  @@map("service_steps")
+}
+
+model ServiceIdealFor {
+  id         Int      @id @default(autoincrement())
+
+  label      String   @db.VarChar(255) // e.g. "Smartphone photos"
+
+  serviceId  Int
+  service    Service  @relation(fields: [serviceId], references: [id])
+
+  @@map("service_ideal_fors")
+}
+
+model ServiceInclude {
+  id         Int     @id @default(autoincrement())
+
+  label      String  @db.VarChar(255)
+
+  serviceId  Int
+  service    Service @relation(fields: [serviceId], references: [id])
+
+  @@map("service_includes")
+}
+
+model ServiceAddOn {
+  id          Int      @id @default(autoincrement())
+
+  title       String   @db.VarChar(255) 
+  description String   @db.Text        
+
+  serviceId   Int
+  service     Service  @relation(fields: [serviceId], references: [id])
+
+  @@map("service_add_ons")
 }
 
 enum MediaType {

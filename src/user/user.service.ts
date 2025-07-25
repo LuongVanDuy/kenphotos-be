@@ -19,8 +19,8 @@ export class UserService {
     return this.prisma.user.findMany({
       where: {
         email: likeField(search),
-        ...(deleteFlg !== undefined ? { deleteFlg } : { deleteFlg: 0 }),
-        ...(status !== undefined && { status }),
+        ...(deleteFlg !== undefined ? { deleteFlg: Number(deleteFlg) } : { deleteFlg: 0 }),
+        ...(status !== undefined ? { status: Number(status) } : {}),
       },
       select: {
         id: true,
@@ -43,8 +43,8 @@ export class UserService {
     return this.prisma.user.count({
       where: {
         email: likeField(search),
-        ...(deleteFlg !== undefined ? { deleteFlg } : { deleteFlg: 0 }),
-        ...(status !== undefined && { status }),
+        ...(deleteFlg !== undefined ? { deleteFlg: Number(deleteFlg) } : { deleteFlg: 0 }),
+        ...(status !== undefined ? { status: Number(status) } : {}),
       },
     });
   }

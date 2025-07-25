@@ -6,6 +6,7 @@ import { FindPostDto } from "./dto/find-post.dto";
 import { SuccessType } from "src/common/types";
 import { CreatePostDto } from "./dto/create-post.dto";
 import { UpdatePostDto } from "./dto/update-post";
+import { BulkIdsDto } from "./dto/bulk-post.dto";
 
 @Injectable()
 export class PostService {
@@ -111,8 +112,8 @@ export class PostService {
     const { search, status, deleteFlg, pageable, sort } = params;
 
     const where: any = {
-      ...(deleteFlg !== undefined ? { deleteFlg } : { deleteFlg: 0 }),
-      ...(status !== undefined && { status }),
+      ...(deleteFlg !== undefined ? { deleteFlg: Number(deleteFlg) } : { deleteFlg: 0 }),
+      ...(status !== undefined ? { status: Number(status) } : {}),
       title: likeField(search),
     };
 
@@ -135,8 +136,8 @@ export class PostService {
     const { search, status, deleteFlg } = params;
 
     const where: any = {
-      ...(deleteFlg !== undefined ? { deleteFlg } : { deleteFlg: 0 }),
-      ...(status !== undefined && { status }),
+      ...(deleteFlg !== undefined ? { deleteFlg: Number(deleteFlg) } : { deleteFlg: 0 }),
+      ...(status !== undefined ? { status: Number(status) } : {}),
       title: likeField(search),
     };
 
@@ -322,17 +323,14 @@ export class PostService {
     };
   }
 
-  async delete(userRequest: User, id: number) {
-    const post = await this.prisma.post.findUnique({
-      where: { id },
-    });
+  async bulkSoftDelete(userRequest: User, dto: BulkIdsDto): Promise<any> {
+    const { ids } = dto;
 
-    if (!post || post.deleteFlg === 1) {
-      throw new NotFoundException("Bài viết không tồn tại hoặc đã bị xóa");
-    }
-
-    await this.prisma.post.update({
-      where: { id },
+    await this.prisma.post.updateMany({
+      where: {
+        id: { in: ids },
+        deleteFlg: 0,
+      },
       data: {
         deleteFlg: 1,
         updatedUser: userRequest.id,
@@ -341,9 +339,45 @@ export class PostService {
     });
 
     return {
-      id,
+      ids,
       success: true,
       type: SuccessType.DELETE,
+    };
+  }
+
+  async bulkRestore(userRequest: User, dto: BulkIdsDto): Promise<any> {
+    const { ids } = dto;
+
+    await this.prisma.post.updateMany({
+      where: {
+        id: { in: ids },
+        deleteFlg: 1,
+      },
+      data: {
+        deleteFlg: 0,
+        updatedUser: userRequest.id,
+        updatedTime: new Date(),
+      },
+    });
+
+    return {
+      ids,
+      success: true,
+      type: SuccessType.RESTORE,
+    };
+  }
+
+  async bulkHardDelete(userRequest: User, dto: BulkIdsDto): Promise<any> {
+    const { ids } = dto;
+
+    await this.prisma.post.deleteMany({
+      where: { id: { in: ids } },
+    });
+
+    return {
+      ids,
+      success: true,
+      type: SuccessType.HARD_DELETE,
     };
   }
 }

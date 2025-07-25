@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { User } from "@prisma/client";
 import { PrismaService } from "src/prisma.service";
 import { likeField } from "src/common/functions";
@@ -202,7 +202,50 @@ export class CategoryService {
     };
   }
 
-  async delete(userRequest: User, id: number): Promise<any> {
+  async deleteMany(userRequest: User, ids: number[]): Promise<any> {
+    if (!ids.length) {
+      throw new BadRequestException("Danh sách ID không được để trống");
+    }
+
+    const existing = await this.prisma.category.findMany({
+      where: {
+        id: { in: ids },
+      },
+      select: { id: true, isDefault: true },
+    });
+
+    const existingIds = existing.map((c) => c.id);
+    const notFoundIds = ids.filter((id) => !existingIds.includes(id));
+
+    if (notFoundIds.length) {
+      throw new NotFoundException(`Không tìm thấy danh mục với ID: ${notFoundIds.join(", ")}`);
+    }
+
+    const defaultCategory = existing.find((c) => c.isDefault);
+    if (defaultCategory) {
+      throw new BadRequestException("Không thể xóa danh mục mặc định");
+    }
+
+    await this.prisma.postCategory.deleteMany({
+      where: {
+        categoryId: { in: ids },
+      },
+    });
+
+    await this.prisma.category.deleteMany({
+      where: {
+        id: { in: ids },
+      },
+    });
+
+    return {
+      ids: existingIds,
+      success: true,
+      type: SuccessType.DELETE,
+    };
+  }
+
+  async setDefaultCategory(userRequest: User, id: number): Promise<any> {
     const category = await this.prisma.category.findUnique({
       where: { id },
     });
@@ -211,10 +254,15 @@ export class CategoryService {
       throw new NotFoundException("Danh mục không tồn tại");
     }
 
+    await this.prisma.category.updateMany({
+      data: { isDefault: false },
+      where: { isDefault: true },
+    });
+
     await this.prisma.category.update({
       where: { id },
       data: {
-        deleteFlg: 1,
+        isDefault: true,
         updatedUser: userRequest.id,
         updatedTime: new Date(),
       },
@@ -223,7 +271,7 @@ export class CategoryService {
     return {
       id,
       success: true,
-      type: SuccessType.DELETE,
+      type: "SET_DEFAULT",
     };
   }
 }

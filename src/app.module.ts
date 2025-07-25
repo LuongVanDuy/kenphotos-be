@@ -8,6 +8,7 @@ import { MediaModule } from "./media/media.module";
 import { PostModule } from "./post/post.module";
 import { MailModule } from "./mail/mail.module";
 import { CategoryModule } from "./category/category.module";
+import { ServiceModule } from "./service/service.module";
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { CategoryModule } from "./category/category.module";
     UserModule,
     PostModule,
     CategoryModule,
+    ServiceModule,
     MediaModule,
   ],
   controllers: [AppController],

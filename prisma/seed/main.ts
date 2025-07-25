@@ -51,6 +51,18 @@ async function main() {
     skipDuplicates: true,
   });
 
+  await prisma.category.upsert({
+    where: { slug: "uncategorized" },
+    update: {},
+    create: {
+      name: "Uncategorized",
+      slug: "uncategorized",
+      isDefault: true,
+      createdUser: 1,
+      updatedUser: 1,
+    },
+  });
+
   console.log("✅ Seed completed");
 }
 

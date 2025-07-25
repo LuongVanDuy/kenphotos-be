@@ -16,6 +16,7 @@ export enum SuccessType {
   READ = "read",
   LIST = "list",
   RESTORE = "restore",
+  HARD_DELETE = "hard_delete",
 }
 
 export enum UserRole {
@@ -39,6 +40,7 @@ export enum Module {
   MEDIA = "MEDIA",
   POST = "POST",
   CATEGORY = "CATEGORY",
+  SERVICE = "SERVICE",
 }
 
 export enum Permission {
