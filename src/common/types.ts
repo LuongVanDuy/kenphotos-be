@@ -41,6 +41,7 @@ export enum Module {
   POST = "POST",
   CATEGORY = "CATEGORY",
   SERVICE = "SERVICE",
+  SETTING = "SETTING",
 }
 
 export enum Permission {

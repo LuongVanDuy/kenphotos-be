@@ -4,82 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Test Email Request</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        line-height: 1.6;
-        color: #333;
-        background-color: #f4f4f4;
-        margin: 0;
-        padding: 30px 0;
-        border-radius: 15px;
-      }
-      .email-container {
-        max-width: 600px;
-        margin: 20px auto;
-        background: #ffffff;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        overflow: hidden;
-      }
-      .header {
-        background-color: #ffffff;
-        color: white;
-        padding: 20px;
-        text-align: center;
-      }
-      .header img {
-        max-width: 140px;
-        margin-bottom: 10px;
-      }
-      .header h1 {
-        color: #ff004d;
-      }
-      .content {
-        padding: 20px;
-      }
-      .content h3 {
-        color: #444;
-      }
-      .content p {
-        margin: 10px 0;
-        font-size: 14px;
-      }
-      .content .highlight {
-        font-weight: bold;
-        color: #ff004d;
-      }
-      .footer {
-        background-color: #343a40;
-        color: #ffffff;
-        padding: 15px;
-        text-align: center;
-        font-size: 12px;
-      }
-    </style>
   </head>
   <body>
     <div class="email-container">
-      <!-- Header Section -->
-      <div class="header">
-        <a href="{{domain}}" target="_blank">
-          <img src="{{logoUrl}}" alt="Company Logo" />
-        </a>
         <h1>Test Email Request</h1>
-      </div>
-
-      <!-- Content Section -->
-      <div class="content">
-        <h3>Hello,</h3>
-        <p>You have received a test email request with the following details:</p>
-        <p><strong>Email:</strong> <a href="mailto:{{email}}" class="highlight">{{email}}</a></p>
-      </div>
-
-      <!-- Footer Section -->
-      <div class="footer">
-        <p>This email was sent from <a style="color: #ff004d;" href="{{domain}}" target="_blank">{{domain}}</a>.</p>
-        <p>If this was not intended for you, please ignore this email.</p>
-      </div>
     </div>
   </body>
 </html>

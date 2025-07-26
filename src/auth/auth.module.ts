@@ -8,9 +8,12 @@ import { RedisModule } from "src/redis/redis.module";
 import { JwtStrategy } from "./guards/jwt.strategy";
 import { ApiKeyStrategy } from "./guards/api-key.strategy";
 import { MailModule } from "src/mail/mail.module";
+import { ServiceModule } from "src/service/service.module";
+import { SettingModule } from "src/setting/setting.module";
 
 @Module({
   imports: [
+    SettingModule,
     PassportModule,
     JwtModule.registerAsync({
       useFactory: async (configService: ConfigService) => {

@@ -9,6 +9,7 @@ import { PostModule } from "./post/post.module";
 import { MailModule } from "./mail/mail.module";
 import { CategoryModule } from "./category/category.module";
 import { ServiceModule } from "./service/service.module";
+import { SettingModule } from "./setting/setting.module";
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { ServiceModule } from "./service/service.module";
     CategoryModule,
     ServiceModule,
     MediaModule,
+    SettingModule,
   ],
   controllers: [AppController],
   providers: [],

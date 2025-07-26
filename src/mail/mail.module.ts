@@ -6,33 +6,40 @@ import { ConfigService } from "@nestjs/config";
 import { MailController } from "./mail.controller";
 import { join } from "path";
 import { BullModule } from "@nestjs/bull";
+import { SettingModule } from "src/setting/setting.module";
+import { SettingService } from "src/setting/setting.service";
 
 @Module({
   imports: [
     BullModule.registerQueue({ name: "mail" }),
     MailerModule.forRootAsync({
-      useFactory: (configService: ConfigService) => ({
-        transport: {
-          host: configService.get("SMTP_SERVER"),
-          port: configService.get("SMTP_PORT"),
-          secure: false,
-          auth: {
-            user: configService.get("SMTP_FROM_EMAIL"),
-            pass: configService.get("SMTP_APP_PASSWORD"),
+      imports: [SettingModule],
+      inject: [SettingService],
+      useFactory: async (settingService: SettingService) => {
+        const settings = await settingService.getByNamespace("email");
+
+        return {
+          transport: {
+            host: settings["SMTP_HOST"],
+            port: parseInt(settings["SMTP_PORT"], 10),
+            secure: settings["SMTP_SECURITY"] === "SSL",
+            auth: {
+              user: settings["SMTP_USERNAME"],
+              pass: settings["SMTP_PASSWORD"],
+            },
           },
-        },
-        defaults: {
-          from: `"${configService.get("SMTP_FROM_NAME")}" <${configService.get("SMTP_FROM_EMAIL")}>`,
-        },
-        template: {
-          dir: join(__dirname, "templates"),
-          adapter: new HandlebarsAdapter(),
-          options: {
-            strict: true,
+          defaults: {
+            from: `"${settings["FROM_NAME"]}" <${settings["FROM_EMAIL"]}>`,
           },
-        },
-      }),
-      inject: [ConfigService],
+          template: {
+            dir: join(__dirname, "templates"),
+            adapter: new HandlebarsAdapter(),
+            options: {
+              strict: true,
+            },
+          },
+        };
+      },
     }),
   ],
   controllers: [MailController],

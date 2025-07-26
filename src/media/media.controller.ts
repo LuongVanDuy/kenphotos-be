@@ -48,7 +48,7 @@ export class MediaController {
     return { total, data };
   }
 
-  @Post("upload")
+  @Post()
   @ApiConsumes("multipart/form-data")
   @Roles({ module: Module.MEDIA, permission: Permission.CREATE })
   @UseInterceptors(
@@ -83,5 +83,11 @@ export class MediaController {
     const now = dayjs();
     const result = await Promise.all(files.map((file) => this.mediaService.createFromFile(file, req.user, now)));
     return result.length === 1 ? result[0] : result;
+  }
+
+  @Delete()
+  @Roles({ module: Module.MEDIA, permission: Permission.DELETE })
+  async deleteMany(@Body() ids: number[]) {
+    return this.mediaService.deleteMany(ids);
   }
 }

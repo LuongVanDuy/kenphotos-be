@@ -13,6 +13,7 @@ import { MailService } from "src/mail/mail.service";
 import { VerifyDto } from "./dto/verify.dto";
 import { ForgotPasswordDto } from "./dto/forgot-password.dto";
 import { ResetPasswordDto } from "./dto/reset-password.dto";
+import { SettingService } from "src/setting/setting.service";
 
 @Injectable()
 export class AuthService {
@@ -20,7 +21,8 @@ export class AuthService {
     private jwtService: JwtService,
     private configService: ConfigService,
     private prisma: PrismaService,
-    private mailService: MailService
+    private mailService: MailService,
+    private readonly settingService: SettingService
   ) {}
 
   async validateUser(payload: JwtDto): Promise<any> {
@@ -72,7 +74,12 @@ export class AuthService {
       },
     });
 
-    const verifyUrl = `${this.configService.get("DOMAIN")}/auth/verify-email?token=${token}&email=${encodeURIComponent(user.email)}`;
+    const [siteName, siteUrl] = await Promise.all([
+      this.settingService.getValue("general", "siteName"),
+      this.settingService.getValue("general", "siteUrl"),
+    ]);
+
+    const verifyUrl = `${siteUrl}/auth/verify-email?token=${token}&email=${encodeURIComponent(user.email)}`;
 
     await this.mailService.sendMail({
       to: user.email,
@@ -80,6 +87,7 @@ export class AuthService {
       template: "signup",
       context: {
         verifyUrl,
+        website: siteName,
       },
     });
 
@@ -208,16 +216,21 @@ export class AuthService {
       create: { email: user.email, verifyToken: token },
     });
 
-    const resetLink = `${this.configService.get("DOMAIN")}/auth/reset-password?token=${token}`;
+    const [siteName, siteUrl] = await Promise.all([
+      this.settingService.getValue("general", "siteName"),
+      this.settingService.getValue("general", "siteUrl"),
+    ]);
+
+    const resetLink = `${siteUrl}/auth/reset-password?token=${token}`;
 
     await this.mailService.sendMail({
-      from: this.configService.get("SMTP_FROM_EMAIL"),
       to: [user.email],
       subject: "Yêu cầu đặt lại mật khẩu",
       template: "forgot-password",
       context: {
         name: `${user.firstName || ""} ${user.lastName || ""}`.trim() || user.email,
         resetLink,
+        website: siteName,
       },
     });
 

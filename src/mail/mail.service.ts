@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, InternalServerErrorException } from "@nestjs/common";
 import { ISendMailOptions, MailerService } from "@nestjs-modules/mailer";
 import { PrismaService } from "src/prisma.service";
 import { InjectQueue } from "@nestjs/bull";
@@ -15,7 +15,14 @@ export class MailService {
   ) {}
 
   async sendMail(sendMailOptions: ISendMailOptions) {
-    sendMailOptions.from = this.configService.get("SMTP_FROM_EMAIL");
-    await this.mailerService.sendMail(sendMailOptions);
+    try {
+      sendMailOptions.from = this.configService.get("SMTP_FROM_EMAIL");
+
+      await this.mailerService.sendMail(sendMailOptions);
+    } catch (error) {
+      console.error("[SendMail Error]", error);
+
+      throw new InternalServerErrorException("Gửi email thất bại. Vui lòng kiểm tra lại cấu hình SMTP.");
+    }
   }
 }

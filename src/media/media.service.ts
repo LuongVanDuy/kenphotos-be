@@ -5,7 +5,8 @@ import { likeField } from "../common/functions";
 import { FindMediaDto } from "./dto/find-media.dto";
 import dayjs from "dayjs";
 import { SuccessType } from "src/common/types";
-import { basename, extname } from "path";
+import { basename, extname, join } from "path";
+import * as fs from "fs";
 
 @Injectable()
 export class MediaService {
@@ -81,5 +82,37 @@ export class MediaService {
     if (mime === "application/pdf") return "PDF";
     if (mime === "application/msword" || mime === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") return "DOC";
     return "OTHER";
+  }
+
+  async deleteMany(ids: number[]) {
+    const medias = await this.prisma.media.findMany({
+      where: { id: { in: ids } },
+    });
+
+    const deleted: number[] = [];
+    const failed: { id: number; reason: string }[] = [];
+
+    for (const media of medias) {
+      const filePath = join(process.cwd(), media.slug);
+
+      try {
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+        }
+        deleted.push(media.id);
+      } catch (err) {
+        failed.push({ id: media.id, reason: "Lỗi khi xoá file vật lý" });
+      }
+    }
+
+    await this.prisma.media.deleteMany({
+      where: { id: { in: deleted } },
+    });
+
+    return {
+      success: true,
+      deleted,
+      failed,
+    };
   }
 }
