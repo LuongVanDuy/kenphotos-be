@@ -1,7 +1,7 @@
 import { IsString, IsNotEmpty, IsArray, ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
 
-export class CreateSettingDto {
+export class UpsertSettingDto {
   @IsString()
   @IsNotEmpty()
   key: string;
@@ -11,9 +11,9 @@ export class CreateSettingDto {
   value: string;
 }
 
-export class CreateManySettingsDto {
+export class UpsertManySettingsDto {
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => CreateSettingDto)
-  settings: CreateSettingDto[];
+  @Type(() => UpsertSettingDto)
+  settings: UpsertSettingDto[];
 }

@@ -5,9 +5,7 @@ import { RolesGuard } from "src/auth/guards/roles.guard";
 import { SettingService } from "./setting.service";
 import { Roles } from "src/common/decorators/roles.decorator";
 import { Module, Permission } from "src/common/types";
-import { CreateManySettingsDto } from "./dto/create-setting.dto";
-import { UpdateManySettingsDto } from "./dto/update-setting.dto";
-
+import { UpsertManySettingsDto } from "./dto/upsert-setting.dto";
 @ApiTags("Settings")
 @Controller("settings")
 @ApiBearerAuth()
@@ -15,15 +13,15 @@ import { UpdateManySettingsDto } from "./dto/update-setting.dto";
 export class SettingController {
   constructor(private readonly settingService: SettingService) {}
 
-  @Post(":namespace")
-  @Roles({ module: Module.SETTING, permission: Permission.CREATE })
-  async createManySettings(@Param("namespace") namespace: string, @Body() body: CreateManySettingsDto) {
-    return this.settingService.createMany(namespace, body.settings);
+  @Get(":namespace")
+  @Roles({ module: Module.SETTING, permission: Permission.READ })
+  async getSettingsByNamespace(@Param("namespace") namespace: string) {
+    return this.settingService.getByNamespace(namespace);
   }
 
   @Put(":namespace")
   @Roles({ module: Module.SETTING, permission: Permission.UPDATE })
-  async updateManySettings(@Param("namespace") namespace: string, @Body() body: UpdateManySettingsDto) {
-    return this.settingService.updateMany(namespace, body.settings);
+  async upsertManySettings(@Param("namespace") namespace: string, @Body() body: UpsertManySettingsDto) {
+    return this.settingService.upsertMany(namespace, body.settings);
   }
 }
