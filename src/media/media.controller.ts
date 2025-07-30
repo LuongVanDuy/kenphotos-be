@@ -13,6 +13,8 @@ import dayjs from "dayjs";
 import { basename, extname, join } from "path";
 import * as fs from "fs";
 import { v4 as uuidv4 } from "uuid";
+import { BulkIdsDto } from "./dto/bulk-post.dto";
+import { Users } from "src/common/decorators/users.decorator";
 
 @ApiTags("Media")
 @Controller("media")
@@ -87,7 +89,7 @@ export class MediaController {
 
   @Delete()
   @Roles({ module: Module.MEDIA, permission: Permission.DELETE })
-  async deleteMany(@Body() ids: number[]) {
-    return this.mediaService.deleteMany(ids);
+  async softDelete(@Users() userRequest, @Body() dto: BulkIdsDto) {
+    return await this.mediaService.bulkSoftDelete(userRequest, dto);
   }
 }

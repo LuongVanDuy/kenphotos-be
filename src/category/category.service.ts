@@ -24,6 +24,7 @@ export class CategoryService {
         name: true,
         description: true,
         parentId: true,
+        isDefault: true,
       },
       orderBy: sort,
     });

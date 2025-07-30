@@ -13,19 +13,50 @@ export class PostService {
   constructor(private prisma: PrismaService) {}
 
   async findAllPublic(params: FindPostDto) {
-    const { search, pageable, sort, limitWords } = params;
+    const {
+      search,
+      categorySlug,
+      excludePostSlug, // 👈 Mới
+      pageable,
+      sort,
+      limitWords,
+    } = params;
 
     const where: any = {
-      title: likeField(search),
       status: 1,
       deleteFlg: 0,
+      title: search
+        ? {
+            contains: search,
+            mode: "insensitive",
+          }
+        : undefined,
     };
+
+    if (categorySlug) {
+      where.categories = {
+        some: {
+          category: {
+            slug: categorySlug,
+            deleteFlg: 0,
+          },
+        },
+      };
+    }
+
+    if (excludePostSlug) {
+      where.slug = {
+        not: excludePostSlug,
+      };
+    }
 
     const rawPosts = await this.prisma.post.findMany({
       where,
       select: {
         id: true,
         title: true,
+        thumbnail: true,
+        slug: true,
         excerpt: true,
         content: true,
         author: {
@@ -34,16 +65,25 @@ export class PostService {
             lastName: true,
           },
         },
+        categories: {
+          select: {
+            category: {
+              select: {
+                name: true,
+                slug: true,
+              },
+            },
+          },
+        },
         createdTime: true,
       },
       skip: pageable.offset,
       take: pageable.limit,
-      orderBy: sort,
+      orderBy: sort ?? { createdTime: "desc" },
     });
 
     const data = rawPosts.map((post) => {
       let content = post.content || "";
-
       if (limitWords !== undefined) {
         const words = content.trim().split(/\s+/);
         content = words.slice(0, limitWords).join(" ");
@@ -52,12 +92,15 @@ export class PostService {
       return {
         id: post.id,
         title: post.title,
+        thumbnail: post.thumbnail,
+        slug: post.slug,
         excerpt: post.excerpt,
         content,
-        author: {
-          firstName: post.author.firstName,
-          lastName: post.author.lastName,
-        },
+        author: post.author,
+        categories: post.categories.map((pc) => ({
+          name: pc.category.name,
+          slug: pc.category.slug,
+        })),
         createdTime: post.createdTime,
       };
     });
@@ -66,13 +109,35 @@ export class PostService {
   }
 
   async countPublic(params: FindPostDto): Promise<number> {
-    const { search } = params;
+    const { search, categorySlug, excludePostSlug } = params;
 
     const where: any = {
       status: 1,
       deleteFlg: 0,
-      title: likeField(search),
+      title: search
+        ? {
+            contains: search,
+            mode: "insensitive",
+          }
+        : undefined,
     };
+
+    if (categorySlug) {
+      where.categories = {
+        some: {
+          category: {
+            slug: categorySlug,
+            deleteFlg: 0,
+          },
+        },
+      };
+    }
+
+    if (excludePostSlug) {
+      where.slug = {
+        not: excludePostSlug,
+      };
+    }
 
     return this.prisma.post.count({ where });
   }
@@ -122,9 +187,26 @@ export class PostService {
       select: {
         id: true,
         title: true,
+        thumbnail: true,
+        author: {
+          select: {
+            firstName: true,
+            lastName: true,
+            email: true,
+          },
+        },
+        categories: {
+          select: {
+            category: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+        status: true,
         createdTime: true,
         deleteFlg: true,
-        status: true,
       },
       skip: pageable.offset,
       take: pageable.limit,

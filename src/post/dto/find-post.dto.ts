@@ -6,5 +6,7 @@ export class FindPostDto {
   deleteFlg?: number;
   pageable?: Pageable;
   sort?: Sort;
+  excludePostSlug?: string;
   limitWords?: number;
+  categorySlug?: string;
 }

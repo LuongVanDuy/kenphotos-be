@@ -15,6 +15,11 @@ export class CreateUserDto {
   @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
+  avatarUrl?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
   firstName?: string;
 
   @ApiProperty({ required: false })

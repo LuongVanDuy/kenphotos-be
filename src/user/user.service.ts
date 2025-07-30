@@ -8,6 +8,7 @@ import { hashSync } from "bcrypt";
 import { SuccessType } from "src/common/types";
 import { User } from "@prisma/client";
 import { UpdateUserDto } from "./dto/update-user.dto";
+import { ChangePasswordDto } from "./dto/change-password.dto";
 
 @Injectable()
 export class UserService {
@@ -25,6 +26,7 @@ export class UserService {
       select: {
         id: true,
         email: true,
+        avatarUrl: true,
         firstName: true,
         lastName: true,
         businessName: true,
@@ -61,6 +63,7 @@ export class UserService {
     const user = await this.prisma.user.create({
       data: {
         email: data.email,
+        avatarUrl: data.avatarUrl,
         password: hashSync(data.password, 10),
         firstName: data.firstName ?? null,
         lastName: data.lastName ?? null,
@@ -94,6 +97,7 @@ export class UserService {
       select: {
         id: true,
         email: true,
+        avatarUrl: true,
         firstName: true,
         lastName: true,
         phoneNumber: true,
@@ -141,6 +145,7 @@ export class UserService {
       where: { id },
       data: {
         email: updatedEmail,
+        avatarUrl: data.avatarUrl ?? null,
         firstName: data.firstName ?? null,
         lastName: data.lastName ?? null,
         phoneNumber: data.phoneNumber ?? null,
@@ -184,5 +189,32 @@ export class UserService {
       success: true,
       type: SuccessType.DELETE,
     };
+  }
+
+  async changePassword(userRequest: User, id: number, data: ChangePasswordDto) {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+    });
+    if (!user) {
+      throw new NotFoundException(HttpStatus.NOT_FOUND, "User not exist");
+    }
+
+    if (!data.newPassword) {
+      throw new BadRequestException("New password must be not empty");
+    }
+    if (data.newPassword != data.confirmPassword) {
+      throw new BadRequestException("Confirm new password is not match");
+    }
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        password: hashSync(data.newPassword, 10),
+        updatedUser: userRequest.id,
+        updatedTime: new Date(),
+      },
+    });
+
+    return { id: user.id, success: true, type: SuccessType.UPDATE };
   }
 }

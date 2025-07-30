@@ -10,6 +10,7 @@ import { Roles } from "src/common/decorators/roles.decorator";
 import { Users } from "src/common/decorators/users.decorator";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
+import { ChangePasswordDto } from "./dto/change-password.dto";
 
 @ApiTags("Users")
 @Controller("users")
@@ -69,5 +70,11 @@ export class UserController {
   @Roles({ module: Module.USER, permission: Permission.DELETE })
   async delete(@Users() userRequest, @Param("id") id: number) {
     return await this.userService.delete(userRequest, Number(id));
+  }
+
+  @Put(":id/change-password")
+  @Roles({ module: Module.USER, permission: Permission.UPDATE })
+  async changePassword(@Users() userRequest, @Param("id") id: number, @Body() data: ChangePasswordDto) {
+    return await this.userService.changePassword(userRequest, Number(id), data);
   }
 }

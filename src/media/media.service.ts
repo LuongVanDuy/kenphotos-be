@@ -7,6 +7,8 @@ import dayjs from "dayjs";
 import { SuccessType } from "src/common/types";
 import { basename, extname, join } from "path";
 import * as fs from "fs";
+import { User } from "@prisma/client";
+import { BulkIdsDto } from "./dto/bulk-post.dto";
 
 @Injectable()
 export class MediaService {
@@ -84,7 +86,9 @@ export class MediaService {
     return "OTHER";
   }
 
-  async deleteMany(ids: number[]) {
+  async bulkSoftDelete(userRequest: User, dto: BulkIdsDto): Promise<any> {
+    const ids = dto.ids;
+
     const medias = await this.prisma.media.findMany({
       where: { id: { in: ids } },
     });
@@ -105,9 +109,11 @@ export class MediaService {
       }
     }
 
-    await this.prisma.media.deleteMany({
-      where: { id: { in: deleted } },
-    });
+    if (deleted.length > 0) {
+      await this.prisma.media.deleteMany({
+        where: { id: { in: deleted } },
+      });
+    }
 
     return {
       success: true,

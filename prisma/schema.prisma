@@ -26,6 +26,7 @@ model User {
   timezone          String?   @db.VarChar(100)
   postalCode        String?   @map("postal_code") @db.VarChar(20)
   businessWebsite   String?   @map("business_website") @db.VarChar(255)
+  avatarUrl         String?   @map("avatar_url") @db.VarChar(500)
 
   role              Role      @default(CUSTOMER)
 

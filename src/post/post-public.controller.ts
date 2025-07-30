@@ -15,25 +15,32 @@ export class PostPublicController {
   @ApiQuery({ name: "sortBy", required: false })
   @ApiQuery({ name: "sortDesc", required: false })
   @ApiQuery({ name: "limitWords", required: false })
+  @ApiQuery({ name: "categorySlug", required: false })
+  @ApiQuery({ name: "excludePostSlug", required: false })
   async findAll(
     @Query("search") search?: string,
     @Query("page") page?: number,
     @Query("itemsPerPage") itemsPerPage?: number,
     @Query("sortBy") sortBy?: string,
     @Query("sortDesc") sortDesc?: boolean,
-    @Query("limitWords") limitWords?: number
+    @Query("limitWords") limitWords?: number,
+    @Query("categorySlug") categorySlug?: string,
+    @Query("excludePostSlug") excludePostSlug?: string
   ) {
     const params: FindPostDto = {
       search: search || "",
+      categorySlug: categorySlug || undefined,
+      excludePostSlug: excludePostSlug || undefined,
       pageable: getPageable(Number(page), Number(itemsPerPage)),
       sort: getSort(sortBy, sortDesc),
       limitWords: limitWords !== undefined ? Number(limitWords) : undefined,
     };
+
     const data = await this.postService.findAllPublic(params);
     const total = await this.postService.countPublic(params);
+
     return { total, data };
   }
-
   @Get(":slug")
   async findOne(@Param("slug") slug: string) {
     return await this.postService.findBySlug(slug);
