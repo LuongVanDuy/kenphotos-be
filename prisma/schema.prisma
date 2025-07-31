@@ -129,8 +129,6 @@ model Service {
   author          User      @relation(fields: [authorId], references: [id])
 
   images          ServiceImage[]
-  styles          ServiceStyle[] 
-  steps           ServiceStep[] 
   idealFors       ServiceIdealFor[]
   includes        ServiceInclude[]
   addOns          ServiceAddOn[]
@@ -156,38 +154,6 @@ model ServiceImage {
   service    Service  @relation(fields: [serviceId], references: [id])
 
   @@map("service_images")
-}
-
-model ServiceStyle {
-  id         Int      @id @default(autoincrement())
-
-  title      String   @db.VarChar(255)  
-  beforeUrl  String?  @db.VarChar(1000)  @map("before_url")
-  afterUrl   String?  @db.VarChar(1000)  @map("after_url")
-
-  serviceId  Int
-  service    Service  @relation(fields: [serviceId], references: [id])
-
-  type       Int      @default(0) @db.TinyInt  
-
-  @@map("service_styles")
-}
-
-model ServiceStep {
-  id         Int      @id @default(autoincrement())
-
-  title      String   @db.VarChar(255)
-  content    String   @db.Text
-
-  beforeUrl  String?  @db.VarChar(1000) @map("before_url")
-  afterUrl   String?  @db.VarChar(1000) @map("after_url")
-
-  serviceId  Int
-  service    Service  @relation(fields: [serviceId], references: [id])
-
-  sortOrder  Int?     @map("sort_order") 
-
-  @@map("service_steps")
 }
 
 model ServiceIdealFor {

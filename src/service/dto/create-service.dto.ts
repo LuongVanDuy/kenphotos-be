@@ -12,39 +12,6 @@ class ServiceImageDto {
   afterUrl?: string;
 }
 
-class ServiceStyleDto {
-  @IsString()
-  title: string;
-
-  @IsOptional()
-  @IsString()
-  beforeUrl?: string;
-
-  @IsOptional()
-  @IsString()
-  afterUrl?: string;
-}
-
-class ServiceStepDto {
-  @IsString()
-  title: string;
-
-  @IsString()
-  content: string;
-
-  @IsOptional()
-  @IsString()
-  beforeUrl?: string;
-
-  @IsOptional()
-  @IsString()
-  afterUrl?: string;
-
-  @IsOptional()
-  @IsInt()
-  sortOrder?: number;
-}
-
 class ServiceIdealForDto {
   @IsString()
   label: string;
@@ -116,20 +83,6 @@ export class CreateServiceDto {
   @ValidateNested({ each: true })
   @Type(() => ServiceImageDto)
   images?: ServiceImageDto[];
-
-  @ApiPropertyOptional({ type: [ServiceStyleDto] })
-  @IsOptional()
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => ServiceStyleDto)
-  styles?: ServiceStyleDto[];
-
-  @ApiPropertyOptional({ type: [ServiceStepDto] })
-  @IsOptional()
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => ServiceStepDto)
-  steps?: ServiceStepDto[];
 
   @ApiPropertyOptional({ type: [ServiceIdealForDto] })
   @IsOptional()

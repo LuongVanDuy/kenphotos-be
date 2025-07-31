@@ -48,6 +48,14 @@ export class ServiceService {
   }
 
   async create(userRequest: User, data: CreateServiceDto) {
+    const existingService = await this.prisma.service.findUnique({
+      where: { slug: data.slug },
+    });
+
+    if (existingService) {
+      throw new NotFoundException(`Slug "${data.slug}" đã tồn tại.`);
+    }
+
     const service = await this.prisma.service.create({
       data: {
         title: data.title,
@@ -66,28 +74,6 @@ export class ServiceService {
               create: data.images.map((img) => ({
                 beforeUrl: img.beforeUrl,
                 afterUrl: img.afterUrl,
-              })),
-            }
-          : undefined,
-
-        styles: data.styles?.length
-          ? {
-              create: data.styles.map((style) => ({
-                title: style.title,
-                beforeUrl: style.beforeUrl,
-                afterUrl: style.afterUrl,
-              })),
-            }
-          : undefined,
-
-        steps: data.steps?.length
-          ? {
-              create: data.steps.map((step) => ({
-                title: step.title,
-                content: step.content,
-                beforeUrl: step.beforeUrl,
-                afterUrl: step.afterUrl,
-                sortOrder: step.sortOrder,
               })),
             }
           : undefined,
@@ -154,27 +140,6 @@ export class ServiceService {
             afterUrl: true,
           },
         },
-        styles: {
-          select: {
-            id: true,
-            title: true,
-            beforeUrl: true,
-            afterUrl: true,
-          },
-        },
-        steps: {
-          select: {
-            id: true,
-            title: true,
-            content: true,
-            beforeUrl: true,
-            afterUrl: true,
-            sortOrder: true,
-          },
-          orderBy: {
-            sortOrder: "asc",
-          },
-        },
         idealFors: {
           select: {
             id: true,
@@ -214,6 +179,16 @@ export class ServiceService {
       throw new NotFoundException("Service not found");
     }
 
+    if (data.slug && data.slug !== existing.slug) {
+      const slugExists = await this.prisma.service.findUnique({
+        where: { slug: data.slug },
+      });
+
+      if (slugExists && slugExists.id !== id) {
+        throw new NotFoundException(`Slug "${data.slug}" đã tồn tại.`);
+      }
+    }
+
     const updatedService = await this.prisma.service.update({
       where: { id },
       data: {
@@ -235,26 +210,6 @@ export class ServiceService {
           })),
         },
 
-        styles: {
-          deleteMany: {},
-          create: data.styles?.map((style) => ({
-            title: style.title,
-            beforeUrl: style.beforeUrl,
-            afterUrl: style.afterUrl,
-          })),
-        },
-
-        steps: {
-          deleteMany: {},
-          create: data.steps?.map((step) => ({
-            title: step.title,
-            content: step.content,
-            beforeUrl: step.beforeUrl,
-            afterUrl: step.afterUrl,
-            sortOrder: step.sortOrder,
-          })),
-        },
-
         idealFors: {
           deleteMany: {},
           create: data.idealFors?.map((item) => ({ label: item.label })),
@@ -273,6 +228,8 @@ export class ServiceService {
           })),
         },
 
+        createdTime: new Date(),
+        createdUser: userRequest.id,
         updatedUser: userRequest.id,
         updatedTime: new Date(),
       },
@@ -367,8 +324,6 @@ export class ServiceService {
 
     await Promise.all([
       this.prisma.serviceImage.deleteMany({ where: { serviceId: { in: idList } } }),
-      this.prisma.serviceStyle.deleteMany({ where: { serviceId: { in: idList } } }),
-      this.prisma.serviceStep.deleteMany({ where: { serviceId: { in: idList } } }),
       this.prisma.serviceIdealFor.deleteMany({ where: { serviceId: { in: idList } } }),
       this.prisma.serviceInclude.deleteMany({ where: { serviceId: { in: idList } } }),
       this.prisma.serviceAddOn.deleteMany({ where: { serviceId: { in: idList } } }),
