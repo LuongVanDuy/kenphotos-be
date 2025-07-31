@@ -10,6 +10,7 @@ import { MailModule } from "./mail/mail.module";
 import { CategoryModule } from "./category/category.module";
 import { ServiceModule } from "./service/service.module";
 import { SettingModule } from "./setting/setting.module";
+import { OrderModule } from "./order/order.module";
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { SettingModule } from "./setting/setting.module";
     PostModule,
     CategoryModule,
     ServiceModule,
+    OrderModule,
     MediaModule,
     SettingModule,
   ],

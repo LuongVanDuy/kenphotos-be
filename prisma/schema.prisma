@@ -40,6 +40,7 @@ model User {
   services          Service[]
   posts             Post[]
   media             Media[]
+  orders            Order[]
 
   @@index([deleteFlg])
   @@map("user")
@@ -132,6 +133,7 @@ model Service {
   idealFors       ServiceIdealFor[]
   includes        ServiceInclude[]
   addOns          ServiceAddOn[]
+  orderItems      OrderItem[]
 
   deleteFlg       Int?      @default(0) @map("delete_flg") @db.TinyInt
   createdUser     Int?      @map("created_user")
@@ -159,7 +161,7 @@ model ServiceImage {
 model ServiceIdealFor {
   id         Int      @id @default(autoincrement())
 
-  label      String   @db.VarChar(255) // e.g. "Smartphone photos"
+  label      String   @db.VarChar(255) 
 
   serviceId  Int
   service    Service  @relation(fields: [serviceId], references: [id])
@@ -188,6 +190,46 @@ model ServiceAddOn {
   service     Service  @relation(fields: [serviceId], references: [id])
 
   @@map("service_add_ons")
+}
+
+model Order {
+  id             Int          @id @default(autoincrement())
+
+  userId         Int?
+  user           User?        @relation(fields: [userId], references: [id])
+
+  name           String
+  email          String
+  phone          String?
+  address        String?
+  note           String?
+  inputFileUrl   String?      @map("input_file_url")
+  outputFileUrl  String?      @map("output_file_url")
+
+  status         Int          @default(0) @db.TinyInt
+  items          OrderItem[]
+
+  deleteFlg      Int?         @default(0) @map("delete_flg") @db.TinyInt
+  createdUser    Int?         @map("created_user")
+  updatedUser    Int?         @map("updated_user")
+  createdTime    DateTime     @default(now()) @map("created_time")
+  updatedTime    DateTime     @default(now()) @map("updated_time")
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id         Int      @id @default(autoincrement())
+  orderId    Int
+  order      Order    @relation(fields: [orderId], references: [id])
+
+  serviceId  Int
+  service    Service  @relation(fields: [serviceId], references: [id])
+
+  quantity   Int      @default(1)
+  price      Float    
+
+  @@map("order_items")
 }
 
 enum MediaType {
