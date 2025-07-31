@@ -155,6 +155,17 @@ export class PostService {
         slug: true,
         excerpt: true,
         content: true,
+        thumbnail: true,
+        categories: {
+          select: {
+            category: {
+              select: {
+                name: true,
+                slug: true,
+              },
+            },
+          },
+        },
         author: {
           select: {
             firstName: true,
