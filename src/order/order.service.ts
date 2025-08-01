@@ -142,6 +142,7 @@ export class OrderService {
                 title: true,
               },
             },
+            serviceId: true,
             quantity: true,
             price: true,
           },

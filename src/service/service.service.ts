@@ -25,6 +25,10 @@ export class ServiceService {
       select: {
         id: true,
         title: true,
+        originalPrice: true,
+        discountedPrice: true,
+        orderCount: true,
+        rating: true,
         createdTime: true,
         deleteFlg: true,
         status: true,
