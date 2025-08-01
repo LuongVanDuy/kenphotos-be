@@ -124,7 +124,7 @@ model Service {
   originalPrice   Float?    @map("original_price")
   discountedPrice Float?    @map("discounted_price")
   rating          Float?    @map("rating")
-  orderCount      Int?      @map("order_count")
+  orderCount      String?      @map("order_count")
 
   authorId        Int
   author          User      @relation(fields: [authorId], references: [id])

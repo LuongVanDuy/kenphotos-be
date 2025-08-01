@@ -70,8 +70,8 @@ export class CreateServiceDto {
 
   @ApiPropertyOptional()
   @IsOptional()
-  @IsInt()
-  orderCount?: number;
+  @IsString()
+  orderCount?: string;
 
   @ApiProperty({ example: 1 })
   @IsInt()
