@@ -11,6 +11,135 @@ import { BulkIdsDto } from "./dto/bulk-post.dto";
 @Injectable()
 export class ServiceService {
   constructor(private prisma: PrismaService) {}
+
+  async findAllPublic(params: FindServiceDto) {
+    const { search, category, pageable, sort } = params;
+
+    const where: any = {
+      type: category ? Number(category) : undefined,
+      deleteFlg: 0,
+      status: 1,
+      title: likeField(search),
+    };
+
+    return this.prisma.service.findMany({
+      where,
+      select: {
+        id: true,
+        slug: true,
+        title: true,
+        content: true,
+        originalPrice: true,
+        discountedPrice: true,
+        orderCount: true,
+        rating: true,
+        type: true,
+        images: {
+          select: {
+            beforeUrl: true,
+            afterUrl: true,
+          },
+        },
+      },
+      skip: pageable.offset,
+      take: pageable.limit,
+      orderBy: sort,
+    });
+  }
+
+  async countPublic(params: FindServiceDto): Promise<number> {
+    const { search, category } = params;
+
+    const where: any = {
+      type: category ? Number(category) : undefined,
+      deleteFlg: 0,
+      status: 1,
+      title: likeField(search),
+    };
+
+    return this.prisma.service.count({ where });
+  }
+
+  async findOneBySlug(slug: string) {
+    // Lấy service hiện tại
+    const service = await this.prisma.service.findFirst({
+      where: { slug },
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        slug: true,
+        type: true,
+        originalPrice: true,
+        discountedPrice: true,
+        rating: true,
+        orderCount: true,
+        images: {
+          select: {
+            id: true,
+            beforeUrl: true,
+            afterUrl: true,
+          },
+        },
+        idealFors: {
+          select: {
+            id: true,
+            label: true,
+          },
+        },
+        includes: {
+          select: {
+            id: true,
+            label: true,
+          },
+        },
+        addOns: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+          },
+        },
+      },
+    });
+
+    if (!service) {
+      throw new NotFoundException("Dịch vụ không tồn tại");
+    }
+
+    // Lấy tối đa 6 dịch vụ khác cùng type, không bao gồm service hiện tại
+    const relatedServices = await this.prisma.service.findMany({
+      where: {
+        type: service.type,
+        NOT: { id: service.id },
+      },
+      take: 6,
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        type: true,
+        content: true,
+        originalPrice: true,
+        discountedPrice: true,
+        rating: true,
+        orderCount: true,
+        images: {
+          select: {
+            id: true,
+            beforeUrl: true,
+            afterUrl: true,
+          },
+        },
+      },
+    });
+
+    return {
+      ...service,
+      relatedServices,
+    };
+  }
+
   async findAll(params: FindServiceDto) {
     const { search, status, deleteFlg, pageable, sort } = params;
 

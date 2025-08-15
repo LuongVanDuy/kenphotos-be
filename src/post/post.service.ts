@@ -13,24 +13,12 @@ export class PostService {
   constructor(private prisma: PrismaService) {}
 
   async findAllPublic(params: FindPostDto) {
-    const {
-      search,
-      categorySlug,
-      excludePostSlug, // 👈 Mới
-      pageable,
-      sort,
-      limitWords,
-    } = params;
+    const { search, categorySlug, excludePostSlug, pageable, sort, limitWords } = params;
 
     const where: any = {
       status: 1,
       deleteFlg: 0,
-      title: search
-        ? {
-            contains: search,
-            mode: "insensitive",
-          }
-        : undefined,
+      title: likeField(search),
     };
 
     if (categorySlug) {
@@ -114,12 +102,7 @@ export class PostService {
     const where: any = {
       status: 1,
       deleteFlg: 0,
-      title: search
-        ? {
-            contains: search,
-            mode: "insensitive",
-          }
-        : undefined,
+      title: likeField(search),
     };
 
     if (categorySlug) {

@@ -11,6 +11,7 @@ import { CategoryModule } from "./category/category.module";
 import { ServiceModule } from "./service/service.module";
 import { SettingModule } from "./setting/setting.module";
 import { OrderModule } from "./order/order.module";
+import { CaptchaModule } from "./capcha/captcha.module";
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { OrderModule } from "./order/order.module";
     OrderModule,
     MediaModule,
     SettingModule,
+    CaptchaModule,
   ],
   controllers: [AppController],
   providers: [],

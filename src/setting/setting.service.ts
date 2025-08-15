@@ -1,7 +1,5 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
-import { User } from "@prisma/client";
+import { Injectable } from "@nestjs/common";
 import { PrismaService } from "src/prisma.service";
-import { likeField } from "src/common/functions";
 import { UpsertSettingDto } from "./dto/upsert-setting.dto";
 
 @Injectable()
