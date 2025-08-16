@@ -43,7 +43,7 @@ import { SettingService } from "src/setting/setting.service";
     }),
   ],
   controllers: [MailController],
-  providers: [MailService],
+  providers: [MailService, SettingService, ConfigService],
   exports: [MailService],
 })
 export class MailModule {}

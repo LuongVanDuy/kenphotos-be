@@ -73,10 +73,6 @@ export class CreateServiceDto {
   @IsString()
   orderCount?: string;
 
-  @ApiProperty({ example: 1 })
-  @IsInt()
-  authorId: number;
-
   @ApiPropertyOptional({ type: [ServiceImageDto] })
   @IsOptional()
   @IsArray()

@@ -124,7 +124,10 @@ model Service {
   originalPrice   Float?    @map("original_price")
   discountedPrice Float?    @map("discounted_price")
   rating          Float?    @map("rating")
-  orderCount      String?      @map("order_count")
+  orderCount      String?   @map("order_count")
+
+  isFeature       Float?    @map("is_feature")
+  videoUrl        String?   @map("video_url")
 
   authorId        Int
   author          User      @relation(fields: [authorId], references: [id])
@@ -133,6 +136,7 @@ model Service {
   idealFors       ServiceIdealFor[]
   includes        ServiceInclude[]
   addOns          ServiceAddOn[]
+  steps           ServiceSteps[]
   orderItems      OrderItem[]
 
   deleteFlg       Int?      @default(0) @map("delete_flg") @db.TinyInt
@@ -190,6 +194,33 @@ model ServiceAddOn {
   service     Service  @relation(fields: [serviceId], references: [id])
 
   @@map("service_add_ons")
+}
+
+model ServiceSteps {
+  id         Int           @id @default(autoincrement())
+  beforeUrl  String?       @db.VarChar(1000) @map("before_url")
+  afterUrl   String?       @db.VarChar(1000) @map("after_url")
+  videoUrl   String?       @db.VarChar(1000) @map("video_url")
+
+  serviceId  Int
+  service    Service       @relation(fields: [serviceId], references: [id])
+
+  steps      StepDetail[]  
+
+  @@map("service_steps")
+}
+
+model StepDetail {
+  id            Int           @id @default(autoincrement())
+  title         String        @db.VarChar(255)
+  content       String?       @db.Text
+  beforeUrl     String?       @db.VarChar(1000) @map("before_url")
+  afterUrl      String?       @db.VarChar(1000) @map("after_url")
+
+  serviceStepId Int
+  serviceStep   ServiceSteps  @relation(fields: [serviceStepId], references: [id])
+
+  @@map("step_details")
 }
 
 model Order {

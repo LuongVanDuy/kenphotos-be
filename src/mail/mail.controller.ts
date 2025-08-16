@@ -1,20 +1,27 @@
 import { Body, Controller, Post, UseGuards } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
+import {  ApiTags } from "@nestjs/swagger";
 import { SendTestEmailDto } from "./dto/send-test-email.dto";
 import { MailService } from "./mail.service";
+import { SettingService } from "src/setting/setting.service";
 
 @ApiTags("Mail")
 @Controller("mail")
 export class MailController {
-  constructor(private readonly configService: ConfigService, private readonly mailService: MailService) {}
+  constructor(
+    private readonly configService: ConfigService, 
+    private readonly mailService: MailService,   
+    private readonly settingService: SettingService 
+  ) {}
 
   @Post("/test")
   async test(@Body() data: SendTestEmailDto) {
-    const fromEmail = this.configService.get("SMTP_FROM_EMAIL");
+    const settings = await this.settingService.getByNamespace("email");
+    const fromEmail = settings["FROM_EMAIL"];
+    const fromName = settings["FROM_NAME"];
 
     await this.mailService.sendMail({
-      from: fromEmail,
+      from: `"${fromName}" <${fromEmail}>`,
       to: data.to,
       subject: "Test email",
       template: "test",

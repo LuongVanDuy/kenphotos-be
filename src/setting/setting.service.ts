@@ -1,10 +1,34 @@
-import { Injectable } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, Injectable } from "@nestjs/common";
 import { PrismaService } from "src/prisma.service";
 import { UpsertSettingDto } from "./dto/upsert-setting.dto";
 
 @Injectable()
 export class SettingService {
   constructor(private prisma: PrismaService) {}
+
+  async getByNamespaces(
+    namespaces: string[],
+  ): Promise<Record<string, Record<string, string>>> {
+    if (!namespaces || namespaces.length === 0) {
+      throw new BadRequestException("Namespaces cannot be empty");  
+    }
+
+    if (namespaces.includes("email")) {
+      throw new ForbiddenException(
+        "Bạn không có quyền truy cập namespace email",
+      );
+    }
+
+    const settings = await this.prisma.setting.findMany({
+      where: { namespace: { in: namespaces } },
+    });
+
+    return settings.reduce((acc, curr) => {
+      if (!acc[curr.namespace]) acc[curr.namespace] = {};
+      acc[curr.namespace][curr.key] = curr.value;
+      return acc;
+    }, {} as Record<string, Record<string, string>>);
+  }
 
   async getByNamespace(namespace: string): Promise<Record<string, string>> {
     const settings = await this.prisma.setting.findMany({
