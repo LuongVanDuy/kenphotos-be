@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Your Order Has Been Created</title>
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px; color: #333;">
+  <div style="margin: auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
+    <h2>Hello {{name}},</h2>
+
+    <p>Thank you for your order at <strong>{{website}}</strong>.</p>
+
+    <p>Here are the details of your order:</p>
+
+    <ul>
+      <li><strong>Order ID:</strong> {{orderId}}</li>
+      <li><strong>Name:</strong> {{customerName}}</li>
+      <li><strong>Email:</strong> {{customerEmail}}</li>
+      <li><strong>Phone:</strong> {{customerPhone}}</li>
+      <li><strong>Address:</strong> {{customerAddress}}</li>
+      <li><strong>Note:</strong> {{note}}</li>
+    </ul>
+
+    <p><strong>Order Items:</strong></p>
+    <ul>
+      {{#each items}}
+        <li>{{serviceName}} - Quantity: {{quantity}} - Price: ${{price}}</li>
+      {{/each}}
+    </ul>
+
+    <p>We will notify you once your order status changes.</p>
+
+    <p style="margin-top: 40px;">Best regards,<br/>The <strong>{{website}}</strong> Team</p>
+  </div>
+</body>
+</html>

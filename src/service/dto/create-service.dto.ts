@@ -1,4 +1,12 @@
-import { IsString, IsOptional, IsNumber, IsInt, IsArray, ValidateNested, IsPositive } from "class-validator";
+import {
+  IsString,
+  IsOptional,
+  IsNumber,
+  IsInt,
+  IsArray,
+  ValidateNested,
+  IsPositive,
+} from "class-validator";
 import { Type } from "class-transformer";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 
@@ -28,6 +36,45 @@ class ServiceAddOnDto {
 
   @IsString()
   description: string;
+}
+
+export class StepDetailDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  title?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  content?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  beforeUrl?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  afterUrl?: string;
+}
+
+export class ServiceStepsDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  beforeUrl?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  afterUrl?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  videoUrl?: string;
+
+  @ApiPropertyOptional({ type: [StepDetailDto] })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => StepDetailDto)
+  steps?: StepDetailDto[];
 }
 
 export class CreateServiceDto {
@@ -100,4 +147,11 @@ export class CreateServiceDto {
   @ValidateNested({ each: true })
   @Type(() => ServiceAddOnDto)
   addOns?: ServiceAddOnDto[];
+
+  @ApiPropertyOptional({ type: [ServiceStepsDto] })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ServiceStepsDto)
+  serviceSteps?: ServiceStepsDto[];
 }

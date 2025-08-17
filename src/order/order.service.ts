@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "src/prisma.service";
 import { likeField } from "src/common/functions";
 import { FindOrderDto } from "./dto/find-order.dto";
@@ -16,7 +16,9 @@ export class OrderService {
     const { search, status, deleteFlg, pageable, sort } = params;
 
     const where: any = {
-      ...(deleteFlg !== undefined ? { deleteFlg: Number(deleteFlg) } : { deleteFlg: 0 }),
+      ...(deleteFlg !== undefined
+        ? { deleteFlg: Number(deleteFlg) }
+        : { deleteFlg: 0 }),
       ...(status !== undefined ? { status: Number(status) } : {}),
       ...(search ? { email: likeField(search) } : {}),
     };
@@ -68,12 +70,46 @@ export class OrderService {
     const { search, status, deleteFlg } = params;
 
     const where: any = {
-      ...(deleteFlg !== undefined ? { deleteFlg: Number(deleteFlg) } : { deleteFlg: 0 }),
+      ...(deleteFlg !== undefined
+        ? { deleteFlg: Number(deleteFlg) }
+        : { deleteFlg: 0 }),
       ...(status !== undefined ? { status: Number(status) } : {}),
       ...(search ? { email: likeField(search) } : {}),
     };
 
     return this.prisma.order.count({ where });
+  }
+
+  async createPublic(data: CreateOrderDto) {
+    const order = await this.prisma.order.create({
+      data: {
+        userId: null,
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        address: data.address,
+        note: data.note,
+        inputFileUrl: data.inputFileUrl,
+        outputFileUrl: data.outputFileUrl,
+        status: data.status || 0,
+        createdUser: null,
+        updatedUser: null,
+        items: {
+          create: data.items.map((item) => ({
+            service: { connect: { id: item.serviceId } },
+            quantity: item.quantity,
+            price: Number(item.price),
+          })),
+        },
+      },
+      select: { id: true },
+    });
+
+    return {
+      id: order.id,
+      success: true,
+      type: SuccessType.CREATE,
+    };
   }
 
   async create(userRequest: User, data: CreateOrderDto) {

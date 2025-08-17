@@ -203,7 +203,7 @@ model ServiceSteps {
   videoUrl   String?       @db.VarChar(1000) @map("video_url")
 
   serviceId  Int
-  service    Service       @relation(fields: [serviceId], references: [id])
+  service    Service       @relation(fields: [serviceId], references: [id], onDelete: Cascade)
 
   steps      StepDetail[]  
 
@@ -218,7 +218,7 @@ model StepDetail {
   afterUrl      String?       @db.VarChar(1000) @map("after_url")
 
   serviceStepId Int
-  serviceStep   ServiceSteps  @relation(fields: [serviceStepId], references: [id])
+  serviceStep   ServiceSteps  @relation(fields: [serviceStepId], references: [id], onDelete: Cascade)
 
   @@map("step_details")
 }

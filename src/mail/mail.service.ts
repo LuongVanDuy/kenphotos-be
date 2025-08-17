@@ -10,7 +10,7 @@ export class MailService {
   constructor(
     private prisma: PrismaService,
     private readonly mailerService: MailerService,
-    private readonly settingService: SettingService, 
+    private readonly settingService: SettingService,
     @InjectQueue("mail") private mailQueue: Queue
   ) {}
 
