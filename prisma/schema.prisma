@@ -299,9 +299,9 @@ model Setting {
   id           Int      @id @default(autoincrement())
   namespace    String   @default("general")
   key          String
-  value        String
-  createdTime  DateTime  @default(now()) @map("created_time")
-  updatedTime  DateTime  @default(now()) @map("updated_time")
+  value        String   @db.Text
+  createdTime  DateTime @default(now()) @map("created_time")
+  updatedTime  DateTime @default(now()) @map("updated_time")
 
   @@unique([namespace, key])
   @@map("setting")
