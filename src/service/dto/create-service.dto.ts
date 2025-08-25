@@ -148,10 +148,8 @@ export class CreateServiceDto {
   @Type(() => ServiceAddOnDto)
   addOns?: ServiceAddOnDto[];
 
-  @ApiPropertyOptional({ type: [ServiceStepsDto] })
+  @ApiPropertyOptional()
   @IsOptional()
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => ServiceStepsDto)
-  serviceSteps?: ServiceStepsDto[];
+  @IsString()
+  steps?: string;
 }

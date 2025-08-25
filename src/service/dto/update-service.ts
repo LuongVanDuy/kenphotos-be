@@ -1,4 +1,12 @@
-import { IsString, IsOptional, IsNumber, IsInt, IsArray, ValidateNested, IsPositive } from "class-validator";
+import {
+  IsString,
+  IsOptional,
+  IsNumber,
+  IsInt,
+  IsArray,
+  ValidateNested,
+  IsPositive,
+} from "class-validator";
 import { Type } from "class-transformer";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 
@@ -120,12 +128,10 @@ export class UpdateServiceDto {
   @Type(() => ServiceStyleDto)
   styles?: ServiceStyleDto[];
 
-  @ApiPropertyOptional({ type: [ServiceStepDto] })
+  @ApiPropertyOptional()
   @IsOptional()
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => ServiceStepDto)
-  steps?: ServiceStepDto[];
+  @IsString()
+  steps?: string;
 
   @ApiPropertyOptional({ type: [ServiceIdealForDto] })
   @IsOptional()

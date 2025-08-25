@@ -105,6 +105,7 @@ export class ServiceService {
             description: true,
           },
         },
+        steps: true,
       },
     });
 
@@ -112,7 +113,6 @@ export class ServiceService {
       throw new NotFoundException("Dịch vụ không tồn tại");
     }
 
-    // Lấy tối đa 6 dịch vụ khác cùng type, không bao gồm service hiện tại
     const relatedServices = await this.prisma.service.findMany({
       where: {
         type: service.type,
@@ -245,25 +245,7 @@ export class ServiceService {
             }
           : undefined,
 
-        steps: data.serviceSteps?.length
-          ? {
-              create: data.serviceSteps.map((step) => ({
-                beforeUrl: step.beforeUrl,
-                afterUrl: step.afterUrl,
-                videoUrl: step.videoUrl,
-                steps: step.steps?.length
-                  ? {
-                      create: step.steps.map((detail) => ({
-                        title: detail.title,
-                        content: detail.content,
-                        beforeUrl: detail.beforeUrl,
-                        afterUrl: detail.afterUrl,
-                      })),
-                    }
-                  : undefined,
-              })),
-            }
-          : undefined,
+        steps: data.steps,
       },
     });
 
@@ -321,6 +303,7 @@ export class ServiceService {
             description: true,
           },
         },
+        steps: true,
       },
     });
 
@@ -350,13 +333,6 @@ export class ServiceService {
         throw new NotFoundException(`Slug "${data.slug}" đã tồn tại.`);
       }
     }
-
-    const incomingStepIds =
-      data.steps?.map((s: any) => s.id).filter(Boolean) ?? [];
-    const incomingDetailIds =
-      data.steps?.flatMap(
-        (s: any) => s.steps?.map((d: any) => d.id).filter(Boolean) ?? []
-      ) ?? [];
 
     const updatedService = await this.prisma.service.update({
       where: { id },
@@ -397,56 +373,7 @@ export class ServiceService {
           })),
         },
 
-        steps: {
-          deleteMany: {
-            id: { notIn: incomingStepIds },
-          },
-          upsert: data.steps?.map((step: any) => ({
-            where: { id: step.id ?? 0 },
-            create: {
-              beforeUrl: step.beforeUrl,
-              afterUrl: step.afterUrl,
-              videoUrl: step.videoUrl,
-              steps: {
-                create: step.steps?.map((detail: any) => ({
-                  title: detail.title,
-                  content: detail.content,
-                  beforeUrl: detail.beforeUrl,
-                  afterUrl: detail.afterUrl,
-                })),
-              },
-            },
-            update: {
-              beforeUrl: step.beforeUrl,
-              afterUrl: step.afterUrl,
-              videoUrl: step.videoUrl,
-              steps: {
-                deleteMany: {
-                  id: {
-                    notIn:
-                      step.steps?.map((d: any) => d.id).filter(Boolean) ?? [],
-                  },
-                },
-                upsert: step.steps?.map((detail: any) => ({
-                  where: { id: detail.id ?? 0 },
-                  create: {
-                    title: detail.title,
-                    content: detail.content,
-                    beforeUrl: detail.beforeUrl,
-                    afterUrl: detail.afterUrl,
-                  },
-                  update: {
-                    title: detail.title,
-                    content: detail.content,
-                    beforeUrl: detail.beforeUrl,
-                    afterUrl: detail.afterUrl,
-                  },
-                })),
-              },
-            },
-          })),
-        },
-
+        steps: data.steps,
         updatedUser: userRequest.id,
         updatedTime: new Date(),
       },
